@@ -5,11 +5,6 @@ using UnityEngine;
 
 public class GridManagerScript : MonoBehaviour
 {
-    [SerializeField] int size;
-    [SerializeField] int[] up;
-    [SerializeField] int[] down;
-    [SerializeField] int[] left;
-    [SerializeField] int[] right;
     [SerializeField] GameObject block;
     GridSolver solver;
     Task solveTask;
@@ -17,19 +12,19 @@ public class GridManagerScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        for (int i = 0; i < size; i++)
+        for (int i = 0; i < VirtualRAM.gridSize; i++)
         {
             Transform row = new GameObject("Row").transform;
             row.parent = transform;
-            row.localPosition = Vector3.forward * (size - 1) * (0.5f - (float)i / (size - 1));
-            for (int j = 0; j < size; j++)
+            row.localPosition = Vector3.forward * (VirtualRAM.gridSize - 1) * (0.5f - (float)i / (VirtualRAM.gridSize - 1));
+            for (int j = 0; j < VirtualRAM.gridSize; j++)
             {
                 Transform cell = Instantiate(block, row).transform;
-                cell.localPosition = Vector3.right * (size - 1) * ((float)j / (size - 1) - 0.5f);
+                cell.localPosition = Vector3.right * (VirtualRAM.gridSize - 1) * ((float)j / (VirtualRAM.gridSize - 1) - 0.5f);
             }
         }
-        solver = new GridSolver(size, transform);
-        solveTask = new Task(() => solver.Solve(new int[][] { up, down, left, right }));
+        solver = new GridSolver(VirtualRAM.gridSize, transform);
+        solveTask = new Task(() => solver.Solve(VirtualRAM.edgeNums));
         solveTask.Start();
         waiting = true;
     }
@@ -60,7 +55,7 @@ class GridSolver
     List<int>[] possibleRows;
     // A Square Grid Of Numbers: When The Grid Is Solved, The Winning Combination Is Left Stored
     int[][] grid;
-    BlockScript[][] blockGrid;
+    readonly BlockScript[][] blockGrid;
     public bool solved { get; private set; }
     ulong total;
     ulong tested;
@@ -176,6 +171,7 @@ class GridSolver
                 tested++;
             }
         }
+        else { Debug.Log("a"); }
     }
     void BuildGrid(in int[] seeds)
     {
