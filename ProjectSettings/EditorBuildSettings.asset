@@ -6,11 +6,11 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/Select Size.unity
+    guid: cf090373658dee54d880984cfcd8c60c
+  - enabled: 1
     path: Assets/Scenes/Fill Data.unity
     guid: 7abdda1a2121b4b4792ee9c70c20d468
-  - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
-    guid: 92d965ee781c34a4d95870cada8ba752
   - enabled: 1
     path: Assets/Scenes/Solve Grid.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab

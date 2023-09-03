@@ -1,5 +1,5 @@
-using TMPro;
 using UnityEngine;
+using TMPro;
 using UnityEngine.SceneManagement;
 
 public class GridUIScript : MonoBehaviour
@@ -9,7 +9,6 @@ public class GridUIScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        VirtualRAM.gridSize = 4;
         VirtualRAM.edgeNums = new int[4][];
         for (int i = 0; i < 4; i++) { VirtualRAM.edgeNums[i] = new int[VirtualRAM.gridSize]; }
         VirtualRAM.filledSlots = new int[VirtualRAM.gridSize][];
@@ -45,7 +44,7 @@ public class GridUIScript : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space) && ValidateInput())
         {
-            SceneManager.LoadScene(1);
+            SceneManager.LoadScene(2);
         }
     }
     bool ValidateInput()
@@ -56,8 +55,8 @@ public class GridUIScript : MonoBehaviour
             for (int j = 0; j < VirtualRAM.gridSize; j++)
             {
                 if (int.TryParse(row.GetChild(j).GetComponent<TMP_InputField>().text, out int n) && n > 0 && n <= VirtualRAM.gridSize) { VirtualRAM.edgeNums[i][j] = n; }
-                else { VirtualRAM.edgeNums[i][j] = 0; }
-                // else { return false; }
+                else if (true) { VirtualRAM.edgeNums[i][j] = 0; }
+                else { return false; }
             }
         }
         for (int i = 0; i < VirtualRAM.gridSize; i++)
