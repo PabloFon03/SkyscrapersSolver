@@ -2,20 +2,35 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using TMPro;
 
 public class GridManagerScript : MonoBehaviour
 {
     [SerializeField] GameObject block;
+    [SerializeField] GameObject edgeSign;
     GridSolver solver;
     Task solveTask;
     bool waiting;
     // Start is called before the first frame update
     void Start()
     {
+        for (int i = 0; i < 4; i++)
+        {
+            Transform row = new GameObject("Row").transform;
+            row.parent = transform.GetChild(0);
+            row.forward = new Vector3[] { Vector3.forward, Vector3.back, Vector3.left, Vector3.right }[i];
+            row.localPosition = row.forward * (0.5f * VirtualRAM.gridSize + 0.5f);
+            for (int j = 0; j < VirtualRAM.gridSize; j++)
+            {
+                Transform cell = Instantiate(edgeSign, row).transform;
+                cell.localPosition = Vector3.right * (VirtualRAM.gridSize - 1) * ((float)j / (VirtualRAM.gridSize - 1) - 0.5f) * (i == 1 || i == 2 ? -1 : 1);
+                cell.GetChild(0).GetComponent<TextMeshPro>().text = VirtualRAM.edgeNums[i][j] > 0 ? VirtualRAM.edgeNums[i][j].ToString() : "?";
+            }
+        }
         for (int i = 0; i < VirtualRAM.gridSize; i++)
         {
             Transform row = new GameObject("Row").transform;
-            row.parent = transform;
+            row.parent = transform.GetChild(1);
             row.localPosition = Vector3.forward * (VirtualRAM.gridSize - 1) * (0.5f - (float)i / (VirtualRAM.gridSize - 1));
             for (int j = 0; j < VirtualRAM.gridSize; j++)
             {
@@ -23,8 +38,8 @@ public class GridManagerScript : MonoBehaviour
                 cell.localPosition = Vector3.right * (VirtualRAM.gridSize - 1) * ((float)j / (VirtualRAM.gridSize - 1) - 0.5f);
             }
         }
-        solver = new GridSolver(VirtualRAM.gridSize, transform);
-        solveTask = new Task(() => solver.Solve(VirtualRAM.edgeNums));
+        solver = new GridSolver(VirtualRAM.gridSize, transform.GetChild(1));
+        solveTask = new Task(() => solver.Solve(VirtualRAM.edgeNums, VirtualRAM.filledSlots));
         solveTask.Start();
         waiting = true;
     }
@@ -121,7 +136,7 @@ class GridSolver
             if (!DuplicateCheck(vals)) { allRows.Add(vals); }
         }
     }
-    bool FindPossibleRows(in int[][] _heightSums)
+    bool FindPossibleRows(in int[][] _heightSums, in int[][] _filledSlots)
     {
         possibleRows = new List<int>[size];
         for (int i = 0; i < size; i++)
@@ -130,33 +145,33 @@ class GridSolver
             for (int j = 0; j < allRows.Count; j++)
             {
                 int[] currentRow = allRows[j];
-                bool leftSum = HeightSumLeft(currentRow) == _heightSums[2][i];
-                bool rightSum = HeightSumRight(currentRow) == _heightSums[3][i];
+                bool leftSum = _heightSums[2][i] == 0 || HeightSumLeft(currentRow) == _heightSums[2][i];
+                bool rightSum = _heightSums[3][i] == 0 || HeightSumRight(currentRow) == _heightSums[3][i];
                 bool columnCheck = true;
-                if (columnCheck)
+                bool gridCheck = true;
+                for (int k = 0; k < size && columnCheck && gridCheck; k++)
                 {
-                    for (int k = 0; k < size && columnCheck; k++)
-                    {
-                        // Single Visible Building Check
-                        if ((i == 0 && _heightSums[0][k] == 1) || (i == size - 1 && _heightSums[1][k] == 1)) { columnCheck = currentRow[k] == size; }
-                        // All Visible Buildings Check
-                        if (_heightSums[0][k] == size) { columnCheck = currentRow[k] == i + 1; }
-                        if (_heightSums[1][k] == size) { columnCheck = currentRow[k] == size - i; }
-                    }
+                    // Pre-Filled Slots Check
+                    if (_filledSlots[i][k] != 0) { gridCheck = currentRow[k] == _filledSlots[i][k]; }
+                    // Single Visible Building Check
+                    if ((i == 0 && _heightSums[0][k] == 1) || (i == size - 1 && _heightSums[1][k] == 1)) { columnCheck = currentRow[k] == size; }
+                    // All Visible Buildings Check
+                    if (_heightSums[0][k] == size) { columnCheck = currentRow[k] == i + 1; }
+                    if (_heightSums[1][k] == size) { columnCheck = currentRow[k] == size - i; }
                 }
-                if (leftSum && rightSum && columnCheck) { possibleRows[i].Add(j); }
+                if (leftSum && rightSum && columnCheck && gridCheck) { possibleRows[i].Add(j); }
             }
             if (possibleRows[i].Count == 0) { return false; }
         }
         return true;
     }
-    public void Solve(in int[][] _heightSums)
+    public void Solve(in int[][] _heightSums, in int[][] _filledSlots)
     {
         solved = false;
         tested = 0;
         grid = new int[size][];
         int[] seeds = new int[size];
-        if (FindPossibleRows(_heightSums))
+        if (FindPossibleRows(_heightSums, _filledSlots))
         {
             total = 1;
             for (int i = 0; i < size; i++) { total *= (ulong)possibleRows[i].Count; }
@@ -206,7 +221,9 @@ class GridSolver
             int heightSumUp = _heightSums[0][i];
             int heightSumDown = _heightSums[1][i];
             int[] column = GetGridColumn(i);
-            if (HeightSumUp(column) != heightSumUp || HeightSumDown(column) != heightSumDown) { return false; }
+            bool upCheck = heightSumUp == 0 || HeightSumUp(column) == heightSumUp;
+            bool downCheck = heightSumDown == 0 || HeightSumDown(column) == heightSumDown;
+            if (!upCheck || !downCheck) { return false; }
         }
         return true;
     }

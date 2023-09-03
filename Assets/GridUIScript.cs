@@ -55,9 +55,9 @@ public class GridUIScript : MonoBehaviour
             Transform row = transform.GetChild(0).GetChild(i);
             for (int j = 0; j < VirtualRAM.gridSize; j++)
             {
-                int n;
-                if (int.TryParse(row.GetChild(j).GetComponent<TMP_InputField>().text, out n) && n > 0 && n <= VirtualRAM.gridSize) { VirtualRAM.edgeNums[i][j] = n; }
-                else { return false; }
+                if (int.TryParse(row.GetChild(j).GetComponent<TMP_InputField>().text, out int n) && n > 0 && n <= VirtualRAM.gridSize) { VirtualRAM.edgeNums[i][j] = n; }
+                else { VirtualRAM.edgeNums[i][j] = 0; }
+                // else { return false; }
             }
         }
         for (int i = 0; i < VirtualRAM.gridSize; i++)
@@ -65,8 +65,7 @@ public class GridUIScript : MonoBehaviour
             Transform row = transform.GetChild(1).GetChild(i);
             for (int j = 0; j < VirtualRAM.gridSize; j++)
             {
-                int n;
-                if (int.TryParse(row.GetChild(j).GetComponent<TMP_InputField>().text, out n) && n > 0 && n <= VirtualRAM.gridSize) { VirtualRAM.filledSlots[i][j] = n; }
+                if (int.TryParse(row.GetChild(j).GetComponent<TMP_InputField>().text, out int n) && n > 0 && n <= VirtualRAM.gridSize) { VirtualRAM.filledSlots[i][j] = n; }
                 else { VirtualRAM.filledSlots[i][j] = 0; }
             }
         }

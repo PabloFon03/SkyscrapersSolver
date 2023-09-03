@@ -63,7 +63,10 @@ public class BlockScript : MonoBehaviour
         {
             case 4: return Color.HSVToRGB(new float[4] { 345, 45, 105, 225 }[_targetHeight - 1] / 360f, 1, 1);
             case 5: return Color.HSVToRGB(new float[5] { 345, 45, 105, 225, 285 }[_targetHeight - 1] / 360f, 1, 1);
-            case 6: return Color.HSVToRGB(new float[6] { 345, 45, 105, 225, 285, 315 }[_targetHeight - 1] / 360f, 1, 1);
+            case 6: return Color.HSVToRGB(new float[6] { 345, 45, 105, 225, 285, 330 }[_targetHeight - 1] / 360f, 1, 1);
+            case 7: return Color.HSVToRGB(new float[7] { 345, 25, 45, 105, 225, 285, 330 }[_targetHeight - 1] / 360f, 1, 1);
+            case 8: return Color.HSVToRGB(new float[8] { 345, 25, 45, 105, 195, 225, 285, 330 }[_targetHeight - 1] / 360f, 1, 1);
+            case 9: return Color.HSVToRGB(new float[9] { 345, 25, 45, 105, 140, 195, 225, 285, 330 }[_targetHeight - 1] / 360f, 1, 1);
             default: return Color.white;
         }
     }
