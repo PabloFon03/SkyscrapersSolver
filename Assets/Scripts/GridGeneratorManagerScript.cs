@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
 using UnityEngine;
-using TMPro;
 
 public class GridGeneratorManagerScript : MonoBehaviour
 {
@@ -22,7 +21,6 @@ public class GridGeneratorManagerScript : MonoBehaviour
             {
                 Transform cell = Instantiate(edgeSign, row).transform;
                 cell.localPosition = Vector3.right * (VirtualRAM.gridData.size - 1) * ((float)j / (VirtualRAM.gridData.size - 1) - 0.5f) * (i == 1 || i == 2 ? -1 : 1);
-                cell.GetChild(0).GetComponent<TextMeshPro>().text = " ";
             }
         }
         for (int i = 0; i < VirtualRAM.gridData.size; i++)
@@ -64,7 +62,7 @@ public class GridGeneratorManagerScript : MonoBehaviour
                 }
                 waiting = false;
             }
-            else { solver.DisplayResult(); }
+            //else { solver.DisplayResult(); }
         }
     }
 }

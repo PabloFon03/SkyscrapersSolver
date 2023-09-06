@@ -244,7 +244,7 @@ public class GridSolver
             {
                 int[] data = i < 2 ? GetGridColumn(j) : grid[j];
                 int heightSum = i % 2 == 0 ? HeightSum(data) : HeightSumReverse(data);
-                _parent.GetChild(i).GetChild(j).GetChild(0).GetComponent<TextMeshPro>().text = heightSum.ToString();
+                _parent.GetChild(i).GetChild(j).GetComponent<EdgeSignScript>().SetValue(heightSum);
             }
         }
     }

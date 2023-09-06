@@ -61,12 +61,15 @@ public class BlockScript : MonoBehaviour
     {
         switch (_gridSize)
         {
+            case 1: return Color.HSVToRGB(Random.value, Random.Range(0.75f, 1), 1);
+            case 2: return Color.HSVToRGB(new float[2] { 345, 225 }[_targetHeight - 1] / 360f, 1, 1);
+            case 3: return Color.HSVToRGB(new float[3] { 315, 45, 210 }[_targetHeight - 1] / 360f, 0.9f, 1);
             case 4: return Color.HSVToRGB(new float[4] { 345, 45, 105, 225 }[_targetHeight - 1] / 360f, 1, 1);
-            case 5: return Color.HSVToRGB(new float[5] { 345, 45, 105, 225, 285 }[_targetHeight - 1] / 360f, 1, 1);
-            case 6: return Color.HSVToRGB(new float[6] { 345, 45, 105, 225, 285, 330 }[_targetHeight - 1] / 360f, 1, 1);
-            case 7: return Color.HSVToRGB(new float[7] { 345, 25, 45, 105, 225, 285, 330 }[_targetHeight - 1] / 360f, 1, 1);
-            case 8: return Color.HSVToRGB(new float[8] { 345, 25, 45, 105, 195, 225, 285, 330 }[_targetHeight - 1] / 360f, 1, 1);
-            case 9: return Color.HSVToRGB(new float[9] { 345, 25, 45, 105, 140, 195, 225, 285, 330 }[_targetHeight - 1] / 360f, 1, 1);
+            case 5: return Color.HSVToRGB(new float[5] { 345, 45, 105, 225, 270 }[_targetHeight - 1] / 360f, _targetHeight == 5 ? 0.9f : 1, 1);
+            case 6: return Color.HSVToRGB(new float[6] { 345, 45, 105, 225, 270, 315 }[_targetHeight - 1] / 360f, _targetHeight > 4 ? 0.9f : 1, 1);
+            case 7: return Color.HSVToRGB(new float[7] { 345, 25, 45, 105, 225, 270, 315 }[_targetHeight - 1] / 360f, _targetHeight > 5 ? 0.9f : 1, 1);
+            case 8: return Color.HSVToRGB(new float[8] { 345, 25, 45, 105, 195, 225, 270, 315 }[_targetHeight - 1] / 360f, _targetHeight > 6 ? 0.9f : 1, 1);
+            case 9: return Color.HSVToRGB(new float[9] { 345, 25, 45, 105, 140, 195, 225, 270, 315 }[_targetHeight - 1] / 360f, _targetHeight > 7 ? 0.9f : 1, 1);
             default: return Color.white;
         }
     }
