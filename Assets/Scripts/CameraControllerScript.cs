@@ -9,7 +9,7 @@ public class CameraControllerScript : MonoBehaviour
     void Start()
     {
         cam = transform.GetChild(0);
-        cam.localPosition = new Vector3(0, 2.5f, -7.5f);
+        cam.localPosition = new Vector3(0, 2, -3.5f - VirtualRAM.gridData.size);
     }
     // Update is called once per frame
     void Update()

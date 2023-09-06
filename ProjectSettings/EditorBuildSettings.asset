@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/Generate Rows.unity
+    guid: 3c5881b2397001946a64f107e0bd585d
+  - enabled: 1
     path: Assets/Scenes/Select Size.unity
     guid: cf090373658dee54d880984cfcd8c60c
   - enabled: 1
@@ -14,4 +17,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Solve Grid.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
+  - enabled: 1
+    path: Assets/Scenes/Generate Grid.unity
+    guid: c7e80644616c082448eafae774b09ffb
   m_configObjects: {}
