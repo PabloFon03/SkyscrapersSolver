@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using TMPro;
 using UnityEngine;
 
 public class GridSolver
@@ -14,12 +13,15 @@ public class GridSolver
     List<int>[] possibleRows;
     // A Square Grid Of Numbers: When The Grid Is Solved, The Winning Combination Is Left Stored
     int[][] grid;
-    readonly BlockScript[][] blockGrid;
-    public bool finished { get; private set; }
+    public bool finished { get; private set; } = true;
     ulong total;
     ulong tested;
     public double progress { get { return total > 0 ? tested / (double)total : 0; } }
-    public GridSolver(int _size, Transform _gridParent)
+    readonly BlockScript[][] blockGrid;
+    readonly EdgeSignScript[][] edgeSigns;
+    bool displayGrid;
+    bool displayEdgeSigns;
+    public GridSolver(int _size, Transform _gridParent, Transform _edgeParent)
     {
         size = _size;
         allRows = VirtualRAM.validRows[size - 1].ToArray();
@@ -29,28 +31,12 @@ public class GridSolver
             blockGrid[i] = new BlockScript[size];
             for (int j = 0; j < size; j++) { blockGrid[i][j] = _gridParent.GetChild(i).GetChild(j).GetComponent<BlockScript>(); }
         }
-    }
-    int CalculatePower(int a, int b)
-    {
-        int p = 1;
-        while (b > 0)
+        edgeSigns = new EdgeSignScript[size][];
+        for (int i = 0; i < 4; i++)
         {
-            p *= a;
-            b--;
+            edgeSigns[i] = new EdgeSignScript[size];
+            for (int j = 0; j < size; j++) { edgeSigns[i][j] = _edgeParent.GetChild(i).GetChild(j).GetComponent<EdgeSignScript>(); }
         }
-        return p;
-    }
-    /// <summary>
-    /// This function checks whether there are duplicates or not in a given set of elements.
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="set">The set to check for duplicates inside of.</param>
-    /// <returns><b>true</b> if a duplicate was found, otherwise <b>false</b>.</returns>
-    bool DuplicateCheck<T>(IEnumerable<T> set)
-    {
-        HashSet<T> values = new HashSet<T>();
-        foreach (T t in set) { if (!values.Add(t)) { return true; } }
-        return false;
     }
     bool FindPossibleRows(in int[][] _heightSums, in int[][] _filledSlots)
     {
@@ -96,6 +82,7 @@ public class GridSolver
                 BuildGrid(seeds);
                 if (IsValidSolution(_heightSums)) { finished = true; } else { UpdateSeed(ref seeds); }
                 tested++;
+                DisplayChecks();
             }
         }
         else { Debug.Log("a"); }
@@ -123,6 +110,7 @@ public class GridSolver
                 CopyRow(i, n);
                 validRow = CheckColumns(i);
                 for (int j = i; j < size; j++) { possibleRows[j].RemoveAt(n); }
+                DisplayChecks();
             }
             possibleRows[i].Clear();
         }
@@ -178,11 +166,7 @@ public class GridSolver
     /// This functions checks that there are no duplicates within any of the grid's columns.
     /// </summary>
     /// <returns><b>true</b> if there are no duplicates in any of the columns, otherwise <b>false</b>.</returns>
-    bool CheckColumns()
-    {
-        for (int i = 0; i < size; i++) { if (DuplicateCheck(GetGridColumn(i))) { return false; } }
-        return true;
-    }
+    bool CheckColumns() { return CheckColumns(size - 1); }
     bool CheckColumns(int rowCount)
     {
         if (rowCount < 1) { return true; }
@@ -235,16 +219,42 @@ public class GridSolver
         }
         Debug.Log(sb.ToString());
     }
-    public void DisplayResult() { for (int i = 0; i < size; i++) { for (int j = 0; j < size; j++) { blockGrid[i][j].SetTargetHeight(grid[i][j], size); } } }
-    public void UpdateEdgeSigns(Transform _parent)
+    void DisplayChecks()
     {
+        if (displayGrid)
+        {
+            DisplayResult(true);
+            displayGrid = false;
+        }
+        if (displayEdgeSigns)
+        {
+            DisplayEdgeSigns(true);
+            displayEdgeSigns = false;
+        }
+    }
+    public void DisplayResult(bool _force = false)
+    {
+        if (!finished && !_force)
+        {
+            displayGrid = true;
+            return;
+        }
+        for (int i = 0; i < size; i++) { for (int j = 0; j < size; j++) { blockGrid[i][j].SetTargetHeight(grid[i][j], size); } }
+    }
+    public void DisplayEdgeSigns(bool _force = false)
+    {
+        if (!finished && !_force)
+        {
+            displayEdgeSigns = true;
+            return;
+        }
         for (int i = 0; i < 4; i++)
         {
             for (int j = 0; j < size; j++)
             {
                 int[] data = i < 2 ? GetGridColumn(j) : grid[j];
                 int heightSum = i % 2 == 0 ? HeightSum(data) : HeightSumReverse(data);
-                _parent.GetChild(i).GetChild(j).GetComponent<EdgeSignScript>().SetValue(heightSum);
+                edgeSigns[i][j].SetValue(heightSum);
             }
         }
     }

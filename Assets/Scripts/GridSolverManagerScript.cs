@@ -43,7 +43,7 @@ public class GridSolverManagerScript : MonoBehaviour
             wall.localPosition = new Vector3[4] { Vector3.up, Vector3.right, Vector3.down, Vector3.left }[i] * (VirtualRAM.gridData.size * 0.5f + 1) + Vector3.forward * 5;
             wall.GetComponent<SpriteRenderer>().size = new Vector2(VirtualRAM.gridData.size + 2, 10);
         }
-        solver = new GridSolver(VirtualRAM.gridData.size, transform.GetChild(1));
+        solver = new GridSolver(VirtualRAM.gridData.size, transform.GetChild(1), transform.GetChild(0));
         solveTask = new Task(() => solver.SolveGrid(VirtualRAM.gridData.edgeNums, VirtualRAM.gridData.filledSlots));
         solveTask.Start();
         waiting = true;

@@ -21,11 +21,22 @@ public class EdgeSignScript : MonoBehaviour
             return _text3D;
         }
     }
+    string newText;
+    bool textChanged;
     private void Update()
     {
         bool topDown = Camera.main.transform.rotation.eulerAngles.x == 90;
         transform.GetChild(0).gameObject.SetActive(topDown);
         transform.GetChild(1).gameObject.SetActive(!topDown);
+        if (textChanged)
+        {
+            text2D.text = text3D.text = newText;
+            textChanged = false;
+        }
     }
-    public void SetValue(int n) { text2D.text = text3D.text = n > 0 ? n.ToString() : ""; }
+    public void SetValue(int n)
+    {
+        newText = n > 0 ? n.ToString() : "";
+        textChanged = !_text3D || newText != text3D.text;
+    }
 }

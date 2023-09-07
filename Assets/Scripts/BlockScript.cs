@@ -5,6 +5,8 @@ public class BlockScript : MonoBehaviour
 {
     Transform block;
     TextMeshPro heightLabel;
+    string newText;
+    bool textChanged;
     float height;
     float targetHeight;
     Color color;
@@ -33,21 +35,27 @@ public class BlockScript : MonoBehaviour
             color = Color.Lerp(color, targetColor, lerpVal);
             block.GetComponent<MeshRenderer>().material.SetColor("_Color", color);
         }
+        if (textChanged)
+        {
+            heightLabel.text = newText;
+            textChanged = false;
+        }
     }
     public void SetTargetHeight(int _targetHeight, int _gridSize)
     {
         if (_targetHeight > 0)
         {
             targetHeight = _targetHeight;
-            heightLabel.text = targetHeight.ToString();
+            newText = targetHeight.ToString();
             targetColor = GetColor(_targetHeight, _gridSize);
         }
         else
         {
             targetHeight = 0.1f;
-            heightLabel.text = "";
+            newText = "";
             targetColor = new Color(0.25f, 0.25f, 0.25f, 1);
         }
+        textChanged = newText != heightLabel.text;
         lerpVal = 0;
     }
     void SetHeight(float _height)
