@@ -225,16 +225,17 @@ public class GridSolver
     }
     public void DisplayResult(bool _force = false)
     {
+        if (status == Status.Idle) { return; }
         if (status == Status.Running && !_force)
         {
             displayGrid = true;
             return;
         }
-        try { for (int i = 0; i < size; i++) { for (int j = 0; j < size; j++) { gridBlocks[i][j].SetTargetHeight(grid[i][j], size); } } }
-        catch { displayGrid = true; }
+        for (int i = 0; i < size; i++) { for (int j = 0; j < size; j++) { gridBlocks[i][j].SetTargetHeight(grid[i][j], size); } }
     }
     public void DisplayEdgeSigns(bool _force = false)
     {
+        if (status == Status.Idle) { return; }
         if (status == Status.Running && !_force)
         {
             displayEdgeSigns = true;

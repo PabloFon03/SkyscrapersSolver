@@ -58,7 +58,7 @@ public class CameraControllerScript : MonoBehaviour
                 break;
             case States.Orthographic:
                 Camera.main.orthographic = true;
-                Camera.main.orthographicSize = new float[9] { 5, 5, 5, 3.5f, 5, 5, 5, 5, 6 }[VirtualRAM.gridData.size - 1];
+                Camera.main.orthographicSize = new float[9] { 5, 5, 5, 3.5f, 4, 4.5f, 5, 5.5f, 6 }[VirtualRAM.gridData.size - 1];
                 targetAngle = Mathf.RoundToInt(angle / 90) * 90;
                 break;
             case States.Top:
@@ -75,12 +75,12 @@ public class CameraControllerScript : MonoBehaviour
         switch (currentState)
         {
             case States.Perspective:
-                heights = new float[9] { 1, 1, 1, 2, 2.5f, 1, 1, 4, 4.5f };
-                float[] depths = new float[9] { 4, 7.5f, 1, 7.5f, 9, 1, 1, 14.5f, 15 };
+                heights = new float[9] { 1, 1, 1, 2, 2.5f, 3, 3.5f, 4, 4.5f };
+                float[] depths = new float[9] { 4, 7.5f, 1, 7.5f, 9, 10.5f, 12, 14.5f, 15 };
                 cam.localPosition = new Vector3(0, heights[VirtualRAM.gridData.size - 1], -depths[VirtualRAM.gridData.size - 1]);
                 break;
             case States.Orthographic:
-                heights = new float[9] { 1, 1, 1, 2, 2.5f, 1, 1, 4, 4.5f };
+                heights = new float[9] { 1, 1, 1, 2, 2.5f, 3, 3.5f, 4, 4.5f };
                 cam.localPosition = new Vector3(0, heights[VirtualRAM.gridData.size - 1], -VirtualRAM.gridData.size * 2);
                 break;
             case States.Top:
