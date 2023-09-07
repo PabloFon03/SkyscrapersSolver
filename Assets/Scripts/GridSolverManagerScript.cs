@@ -1,63 +1,28 @@
 using System.Threading.Tasks;
-using UnityEngine;
-using TMPro;
 
-public class GridSolverManagerScript : MonoBehaviour
+public class GridSolverManagerScript : VisualGridManager
 {
-    [SerializeField] GameObject block;
-    [SerializeField] GameObject edgeSign;
-    GridSolver solver;
-    Task solveTask;
-    bool waiting;
-    // Start is called before the first frame update
-    void Start()
+    protected override void OnStart()
     {
         for (int i = 0; i < 4; i++)
         {
-            Transform row = new GameObject("Row").transform;
-            row.parent = transform.GetChild(0);
-            row.forward = new Vector3[] { Vector3.forward, Vector3.back, Vector3.left, Vector3.right }[i];
-            row.localPosition = row.forward * (0.5f * VirtualRAM.gridData.size + 0.5f);
             for (int j = 0; j < VirtualRAM.gridData.size; j++)
             {
-                Transform cell = Instantiate(edgeSign, row).transform;
-                cell.localPosition = Vector3.right * (VirtualRAM.gridData.size - 1) * ((float)j / (VirtualRAM.gridData.size - 1) - 0.5f) * (i == 1 || i == 2 ? -1 : 1);
-                cell.GetChild(0).GetComponent<TextMeshPro>().text = VirtualRAM.gridData.edgeNums[i][j] > 0 ? VirtualRAM.gridData.edgeNums[i][j].ToString() : "?";
+                transform.GetChild(0).GetChild(i).GetChild(j).GetComponent<EdgeSignScript>().SetValue(VirtualRAM.gridData.edgeNums[i][j]);
             }
         }
-        for (int i = 0; i < VirtualRAM.gridData.size; i++)
-        {
-            Transform row = new GameObject("Row").transform;
-            row.parent = transform.GetChild(1);
-            row.localPosition = Vector3.forward * (VirtualRAM.gridData.size - 1) * (0.5f - (float)i / (VirtualRAM.gridData.size - 1));
-            for (int j = 0; j < VirtualRAM.gridData.size; j++)
-            {
-                Transform cell = Instantiate(block, row).transform;
-                cell.localPosition = Vector3.right * (VirtualRAM.gridData.size - 1) * ((float)j / (VirtualRAM.gridData.size - 1) - 0.5f);
-            }
-        }
-        transform.GetChild(2).GetChild(0).GetComponent<SpriteRenderer>().size = Vector2.one * (VirtualRAM.gridData.size + 2);
-        for (int i = 0; i < 4; i++)
-        {
-            Transform wall = transform.GetChild(2).GetChild(i + 1);
-            wall.localPosition = new Vector3[4] { Vector3.up, Vector3.right, Vector3.down, Vector3.left }[i] * (VirtualRAM.gridData.size * 0.5f + 1) + Vector3.forward * 5;
-            wall.GetComponent<SpriteRenderer>().size = new Vector2(VirtualRAM.gridData.size + 2, 10);
-        }
-        solver = new GridSolver(VirtualRAM.gridData.size, transform.GetChild(1), transform.GetChild(0));
-        solveTask = new Task(() => solver.SolveGrid(VirtualRAM.gridData.edgeNums, VirtualRAM.gridData.filledSlots));
-        solveTask.Start();
+        task = new Task(() => solver.SolveGrid(VirtualRAM.gridData.edgeNums, VirtualRAM.gridData.filledSlots));
+        task.Start();
         waiting = true;
     }
-
-    // Update is called once per frame
-    void Update()
+    protected override void OnUpdate()
     {
         if (waiting)
         {
-            if (solveTask.IsCompleted)
+            if (task.IsCompleted)
             {
-                print(solveTask.IsFaulted ? solveTask.Exception.ToString() : solveTask.Status.ToString());
-                if (solver.finished) { solver.DisplayResult(); }
+                print(task.IsFaulted ? task.Exception.ToString() : task.Status.ToString());
+                if (solver.status == GridSolver.Status.Finished) { solver.DisplayResult(); }
                 waiting = false;
             }
             else { print($"Progress: {solver.progress}"); }

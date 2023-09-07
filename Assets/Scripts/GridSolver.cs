@@ -13,30 +13,21 @@ public class GridSolver
     List<int>[] possibleRows;
     // A Square Grid Of Numbers: When The Grid Is Solved, The Winning Combination Is Left Stored
     int[][] grid;
-    public bool finished { get; private set; } = true;
+    public enum Status { Idle, Running, Finished, Stopped }
+    public Status status { get; private set; } = Status.Idle;
     ulong total;
     ulong tested;
     public double progress { get { return total > 0 ? tested / (double)total : 0; } }
-    readonly BlockScript[][] blockGrid;
     readonly EdgeSignScript[][] edgeSigns;
+    readonly BlockScript[][] gridBlocks;
     bool displayGrid;
     bool displayEdgeSigns;
-    public GridSolver(int _size, Transform _gridParent, Transform _edgeParent)
+    public GridSolver(int _size, EdgeSignScript[][] _edgeSigns, BlockScript[][] _gridBlocks)
     {
         size = _size;
         allRows = VirtualRAM.validRows[size - 1].ToArray();
-        blockGrid = new BlockScript[size][];
-        for (int i = 0; i < size; i++)
-        {
-            blockGrid[i] = new BlockScript[size];
-            for (int j = 0; j < size; j++) { blockGrid[i][j] = _gridParent.GetChild(i).GetChild(j).GetComponent<BlockScript>(); }
-        }
-        edgeSigns = new EdgeSignScript[size][];
-        for (int i = 0; i < 4; i++)
-        {
-            edgeSigns[i] = new EdgeSignScript[size];
-            for (int j = 0; j < size; j++) { edgeSigns[i][j] = _edgeParent.GetChild(i).GetChild(j).GetComponent<EdgeSignScript>(); }
-        }
+        edgeSigns = _edgeSigns;
+        gridBlocks = _gridBlocks;
     }
     bool FindPossibleRows(in int[][] _heightSums, in int[][] _filledSlots)
     {
@@ -69,7 +60,7 @@ public class GridSolver
     }
     public void SolveGrid(in int[][] _heightSums, in int[][] _filledSlots)
     {
-        finished = false;
+        status = Status.Running;
         tested = 0;
         grid = new int[size][];
         int[] seeds = new int[size];
@@ -77,10 +68,10 @@ public class GridSolver
         {
             total = 1;
             for (int i = 0; i < size; i++) { total *= (ulong)possibleRows[i].Count; }
-            while (!finished && seeds[0] < possibleRows[0].Count)
+            while (status == Status.Running && seeds[0] < possibleRows[0].Count)
             {
                 BuildGrid(seeds);
-                if (IsValidSolution(_heightSums)) { finished = true; } else { UpdateSeed(ref seeds); }
+                if (IsValidSolution(_heightSums)) { status = Status.Finished; } else { UpdateSeed(ref seeds); }
                 tested++;
                 DisplayChecks();
             }
@@ -89,10 +80,10 @@ public class GridSolver
     }
     public void GenerateGrid()
     {
-        finished = false;
+        status = Status.Running;
         grid = new int[size][];
         possibleRows = new List<int>[size];
-        System.Random r = new System.Random(System.DateTime.Now.Millisecond);
+        System.Random r = new System.Random((int)System.DateTime.Now.Ticks);
         for (int i = 0; i < size; i++)
         {
             possibleRows[i] = new List<int>();
@@ -114,7 +105,7 @@ public class GridSolver
             }
             possibleRows[i].Clear();
         }
-        finished = true;
+        status = Status.Finished;
     }
     void BuildGrid(in int[] seeds)
     {
@@ -234,16 +225,17 @@ public class GridSolver
     }
     public void DisplayResult(bool _force = false)
     {
-        if (!finished && !_force)
+        if (status == Status.Running && !_force)
         {
             displayGrid = true;
             return;
         }
-        for (int i = 0; i < size; i++) { for (int j = 0; j < size; j++) { blockGrid[i][j].SetTargetHeight(grid[i][j], size); } }
+        try { for (int i = 0; i < size; i++) { for (int j = 0; j < size; j++) { gridBlocks[i][j].SetTargetHeight(grid[i][j], size); } } }
+        catch { displayGrid = true; }
     }
     public void DisplayEdgeSigns(bool _force = false)
     {
-        if (!finished && !_force)
+        if (status == Status.Running && !_force)
         {
             displayEdgeSigns = true;
             return;

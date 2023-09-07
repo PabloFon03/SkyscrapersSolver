@@ -24,7 +24,7 @@ public class CameraControllerScript : MonoBehaviour
         switch (currentState)
         {
             case States.Perspective:
-                angle += Input.GetAxis("Horizontal") * Time.deltaTime;
+                angle += Input.GetAxis("Horizontal") * 90 * Time.deltaTime;
                 while (angle < 0) { angle += 360; }
                 while (angle >= 360) { angle -= 360; }
                 UpdateCameraRotation();
@@ -32,6 +32,13 @@ public class CameraControllerScript : MonoBehaviour
                 else if (Input.GetKeyDown(KeyCode.DownArrow)) { SetState(States.Orthographic); }
                 break;
             case States.Orthographic:
+                if (angle != targetAngle)
+                {
+                    angle = Mathf.Lerp(angle, targetAngle, 0.04f);
+                    if (Mathf.Abs(angle - targetAngle) < 1) { angle = targetAngle; }
+                }
+                else { targetAngle += Input.GetAxisRaw("Horizontal") * 90; }
+                UpdateCameraRotation();
                 if (Input.GetKeyDown(KeyCode.UpArrow)) { SetState(States.Top); }
                 else if (Input.GetKeyDown(KeyCode.DownArrow)) { SetState(States.Perspective); }
                 break;
@@ -50,7 +57,8 @@ public class CameraControllerScript : MonoBehaviour
                 Camera.main.orthographic = false;
                 break;
             case States.Orthographic:
-                Camera.main.orthographic = false;
+                Camera.main.orthographic = true;
+                Camera.main.orthographicSize = new float[9] { 5, 5, 5, 3.5f, 5, 5, 5, 5, 6 }[VirtualRAM.gridData.size - 1];
                 targetAngle = Mathf.RoundToInt(angle / 90) * 90;
                 break;
             case States.Top:
@@ -63,13 +71,17 @@ public class CameraControllerScript : MonoBehaviour
     }
     void UpdateCameraPosition()
     {
+        float[] heights;
         switch (currentState)
         {
             case States.Perspective:
-                cam.localPosition = new Vector3(0, 0.875f + 0.375f * VirtualRAM.gridData.size, -2.75f - 1.325f * VirtualRAM.gridData.size);
+                heights = new float[9] { 1, 1, 1, 2, 2.5f, 1, 1, 4, 4.5f };
+                float[] depths = new float[9] { 4, 7.5f, 1, 7.5f, 9, 1, 1, 14.5f, 15 };
+                cam.localPosition = new Vector3(0, heights[VirtualRAM.gridData.size - 1], -depths[VirtualRAM.gridData.size - 1]);
                 break;
             case States.Orthographic:
-                cam.localPosition = new Vector3(0, 0.75f + 0.25f * VirtualRAM.gridData.size, -2.5f - 1.25f * VirtualRAM.gridData.size);
+                heights = new float[9] { 1, 1, 1, 2, 2.5f, 1, 1, 4, 4.5f };
+                cam.localPosition = new Vector3(0, heights[VirtualRAM.gridData.size - 1], -VirtualRAM.gridData.size * 2);
                 break;
             case States.Top:
                 cam.localPosition = Vector3.back * (VirtualRAM.gridData.size + 1);
@@ -82,7 +94,7 @@ public class CameraControllerScript : MonoBehaviour
         {
             case States.Perspective:
             case States.Orthographic:
-                transform.rotation = Quaternion.Euler(Vector3.up * -90 * angle);
+                transform.rotation = Quaternion.Euler(-Vector3.up * angle);
                 break;
             case States.Top:
                 transform.rotation = Quaternion.Euler(Vector3.right * 90);

@@ -69,7 +69,9 @@ public class BlockScript : MonoBehaviour
     {
         switch (_gridSize)
         {
-            case 1: return Color.HSVToRGB(Random.value, Random.Range(0.75f, 1), 1);
+            case 1:
+                System.Random r = new System.Random((int)System.DateTime.Now.Ticks);
+                return Color.HSVToRGB(r.Next(360) / 360f, r.Next(75, 100) * 0.01f, 1);
             case 2: return Color.HSVToRGB(new float[2] { 345, 225 }[_targetHeight - 1] / 360f, 1, 1);
             case 3: return Color.HSVToRGB(new float[3] { 315, 45, 210 }[_targetHeight - 1] / 360f, 0.9f, 1);
             case 4: return Color.HSVToRGB(new float[4] { 345, 45, 105, 225 }[_targetHeight - 1] / 360f, 1, 1);
