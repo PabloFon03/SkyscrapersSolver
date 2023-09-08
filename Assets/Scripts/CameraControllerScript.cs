@@ -4,6 +4,7 @@ using UnityEngine.SceneManagement;
 public class CameraControllerScript : MonoBehaviour
 {
     Transform cam;
+    Light camLight;
     float angle;
     float targetAngle;
     enum States { Perspective, Orthographic, Top };
@@ -15,6 +16,7 @@ public class CameraControllerScript : MonoBehaviour
         targetAngle = 0;
         currentState = States.Perspective;
         cam = transform.GetChild(0);
+        camLight = cam.GetChild(0).GetComponent<Light>();
         UpdateCameraPosition();
     }
     // Update is called once per frame
@@ -64,6 +66,7 @@ public class CameraControllerScript : MonoBehaviour
         }
         UpdateCameraPosition();
         UpdateCameraRotation();
+        UpdateLight();
     }
     void UpdateCameraPosition()
     {
@@ -91,6 +94,22 @@ public class CameraControllerScript : MonoBehaviour
                 break;
             case States.Top:
                 transform.rotation = Quaternion.Euler(Vector3.right * 90);
+                break;
+        }
+    }
+    void UpdateLight()
+    {
+        camLight.intensity = currentState == States.Top ? 0.75f : 1;
+        switch (currentState)
+        {
+            case States.Perspective:
+                camLight.transform.localRotation = Quaternion.Euler(new Vector3(30, -30));
+                break;
+            case States.Orthographic:
+                camLight.transform.localRotation = Quaternion.Euler(new Vector3(30, 0));
+                break;
+            case States.Top:
+                camLight.transform.localRotation = Quaternion.identity;
                 break;
         }
     }
