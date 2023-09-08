@@ -13,7 +13,7 @@ public class GridUIScript : MonoBehaviour
         for (int i = 0; i < 4; i++) { VirtualRAM.gridData.edgeNums[i] = new int[VirtualRAM.gridData.size]; }
         VirtualRAM.gridData.filledSlots = new int[VirtualRAM.gridData.size][];
         for (int i = 0; i < VirtualRAM.gridData.size; i++) { VirtualRAM.gridData.filledSlots[i] = new int[VirtualRAM.gridData.size]; }
-        Camera.main.orthographicSize = VirtualRAM.gridData.size + 1;
+        Camera.main.orthographicSize = 0.5f * VirtualRAM.gridData.size + 2.5f;
         for (int i = 0; i < 4; i++)
         {
             Transform row = new GameObject("Row").transform;
